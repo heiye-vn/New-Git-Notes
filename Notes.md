@@ -154,7 +154,7 @@
 
 
 
-### 2.版本回退
+###3.版本回退
 
 ​	  **注**：当我们在对某个文件进行多次修改时，使用`git commit`命令后就会存在多个版本，类似多个版本快照，如果后面修改失误可以回退到最近修改的一个版本中重新进行修改
 
@@ -521,6 +521,293 @@ Git tracks change of files.
    ​			2.关联后使用`git push -u origin master`第一次推送master分支的所有内容
 
    ​			3.以后，每次在本地提交后，只要有必要就可以使用`git push origin master`推送最新修改
+
+
+
+### 3.从远程仓库克隆
+
+​		一个项目在进行多人开发时，每个人可以从远程仓库里克隆一个原始版本，添加内容后再推送到远程仓库，这时就可以使用`git clone`命令进行版本克隆
+
+```cmd
+$ git clone git@github.com:heiye-vn/gitSkills.git
+Cloning into 'gitSkills'...
+remote: Enumerating objects: 3, done.
+remote: Counting objects: 100% (3/3), done.
+remote: Total 3 (delta 0), reused 0 (delta 0), pack-reused 0
+Receiving objects: 100% (3/3), done.
+
+```
+
+**小结：**1.要克隆一个仓库，首先必须知道仓库的地址，然后使用`git clone`命令克隆
+
+​			2.Git支持多种协议，包括https，ssh等，但通过ssh支持的原生 git 协议速度最快
+
+
+
+## 四、分支管理
+
+### 1.概念
+
+​		`定义`：什么是分支？举个栗子，平时在看一些科幻类的电影或者动漫中总会听到过平行宇宙（平行空间）这个名词，一个人在不同的空间里做着不同的事情，相互之间不会干预，分支就是如此，不过可能在某个时间点，两者会相遇，这样就造成了分支冲突
+
+![分支](https://www.liaoxuefeng.com/files/attachments/919021987875136/0)
+
+​		`意义`：比如在进行多人开发项目中，你的工作内容可能不会在短时间内完成，就不能提交到主分支上（影响别人工作），但是又必须要做内容提交，此时就可以创建一个属于自己的分支，可以进行任何操作，等工作内容完成之后再合并到主分支上，这样就给自己和别人带来很大的方便
+
+
+
+### 2.创建与合并分支
+
+​		在**版本回退**小节里，我们知道，每次提交修改，git 都会把不同的版本串成一条时间线，这条时间线就是一个分支，这个分支在 Git 中叫做`主分支`，即master分支。`HEAD`严格来说不是指向提交，而是指向`master`，master才是指向提交的，所以，`HEAD`指向的是当前分支。
+
+​		一开始，master分支是一条线，Git 用master指向最新的提交，再用 HEAD 指向 master，以及当前分支的提交点：
+
+![](https://www.liaoxuefeng.com/files/attachments/919022325462368/0)
+
+
+
+​		每次提交，master分支就会向前移动一步，这样，随着不断提交，master分支线也逐渐变长，下面创建一个新的分支`dev`，指向`master`相同的提交，再把`HEAD`指向dev，就表示当前分支在dev上：
+
+![](https://www.liaoxuefeng.com/files/attachments/919022363210080/0)
+
+​		由此可见，Git创建一个分支很快，因为除了增加一个dev指针，改下HEAD的指向，工作区的文件没有发生任何，这样，对工作区的修改和提交就是针对`dev`分支了，如：新提交一次后，dev指针向前移动，而master指针不变：
+
+![](https://www.liaoxuefeng.com/files/attachments/919022387118368/0)
+
+​		接下来，如果我们在dev分支上的工作完成之后，就可以把`dev`合并到`master`上，怎么合并？直接把master指向dev的当前提交，从而完成合并：
+
+![](https://www.liaoxuefeng.com/files/attachments/919022412005504/0)
+
+​		最后，合并完之后可以根据需求删除`dev`分支，删除dev分支就是把dev指针给删掉，删掉后就保留了一条`master`主分支：
+
+![](https://www.liaoxuefeng.com/files/attachments/919022479428512/0)
+
+​		**举栗子演示**：
+
+1. ​	创建分支并切换
+
+   ​	`git checkout -b dev`
+
+   ```cmd
+   $ git checkout -b dev			// -b 参数表示创建并切换
+   Switched to a new branch 'dev'
+   // 相当于以下命令
+   $ git branch dev
+   $ git checkout dev
+   ```
+
+2. 使用 `git branch`查看当前分支
+
+   ```cmd
+   $ git branch
+   * dev
+     master
+   // *表示当前分支 
+   ```
+
+3. 可以在`dev`分支上进行正常提交
+
+   ```cmd
+   // 在README.md上添加内容并查看
+   $ echo Creating a new branch is quick >> README.md
+   $ cat README.md
+   # gitSkillsCreating a new branch is quick
+   
+   // 然后添加并提交README.md文件
+   $ git add README.md
+   warning: LF will be replaced by CRLF in README.md.
+   The file will have its original line endings in your working directory
+   $ git commit -m "branch test"
+   [dev c2472e7] branch test
+    1 file changed, 1 insertion(+), 1 deletion(-)
+   
+   // 再切换到master分支上并查看README.md内容
+   $ git checkout master
+   Switched to branch 'master'
+   Your branch is up to date with 'origin/master'.
+   $ cat README.md
+   # gitSkills
+   ```
+
+4. 可以发现切换到master分支后并没有README.md文件的修改内容，这是因为开始提交在了`dev`分支上，此时`master`分支的提交点并没有变：
+
+   ![](https://www.liaoxuefeng.com/files/attachments/919022533080576/0)
+
+5. 合并分支`git merge dev`
+
+   ```cmd
+   // 合并分支并查看文件内容
+   $ git merge dev
+   Updating e369667..c2472e7
+   Fast-forward				// 表示当前提交模式为“快进模式”，并不是每次合并都是在该模式下
+    README.md | 2 +-
+    1 file changed, 1 insertion(+), 1 deletion(-)
+   $ cat README.md
+   # gitSkillsCreating a new branch is quick
+   
+   ```
+
+6. 删除分支`git branch -d dev`
+
+   ```cmd
+   $ git branch -d dev
+   Deleted branch dev (was c2472e7).
+   $ git branch
+   * master
+   ```
+
+   ​		**小结**：查看分支`git branch` —> 创建分支`git branch name` —> 切换分支`git checkout name` —> 创建+切换分支`git checkout -b name` —> 合并某分支到当前分支`git merge name` —> 删除分支`git branch -d name`
+
+   ​	Git 建议多使用分支来进行工作，合并之后再删除分支，效果和直接在`master`主分支上工作一样，但创建分支工作过程更安全稳定
+
+
+
+### 3.解决冲突（重）
+
+​	在工作中**分支冲突**的问题也是可能会出现的，如何解决分支冲突对于我们来说是有必要知道的
+
+​	**实例**：
+
+1. 创建一个branch1分支并切换到该分支
+
+   ```cmd
+   $ git checkout -b branch1
+   ```
+
+2. 在readme.txt文件中新增一行内容
+
+   ![](F:\Git-Study\GitCourse-Liao Xuefeng version\images/4.png)
+
+3. 在branch1分支上添加并提交修改
+
+   ```cmd
+   $ git add readme.txt
+   $ git commit -m "AND simple"
+   [branch1 9e582c6] AND simple
+    1 file changed, 2 insertions(+), 1 deletion(-)
+   ```
+
+4. 切换到主分支master上，再修改readme.txt文本内容
+
+   ```cmd
+   $ git checkout master
+   Switched to branch 'master'
+   ```
+
+   ![](F:\Git-Study\GitCourse-Liao Xuefeng version\images/5.png)
+
+5. 在master分支上添加并提交修改
+
+   ```cmd
+   $ git add readme.txt
+   $ git commit -m "& simple"
+   [master 2cf795e] & simple
+    1 file changed, 2 insertions(+), 1 deletion(-)
+   ```
+
+   此时分支图如下：
+
+   ![](https://www.liaoxuefeng.com/files/attachments/919023000423040/0)
+
+6. 当合并branch1时，会出现**分支冲突**的报错
+
+   ```cmd
+   $ git merge branch1
+   Auto-merging readme.txt
+   CONFLICT (content): Merge conflict in readme.txt
+   // 冲突(内容):readme.txt中的合并冲突
+   Automatic merge failed; fix conflicts and then commit the result.
+   // 自动合并失败;修复冲突，然后提交结果。
+   
+   $ git status			// 状态显示也报错
+   On branch master
+   You have unmerged paths.
+     (fix conflicts and run "git commit")
+     (use "git merge --abort" to abort the merge)
+   
+   Unmerged paths:
+     (use "git add <file>..." to mark resolution)
+   
+           both modified:   readme.txt
+   
+   no changes added to commit (use "git add" and/or "git commit -a")
+   
+   ```
+
+   此时readme.txt内容为：
+
+   ```cmd
+   $ cat readme.txt
+   Git is a distributed version control system.
+   Git is free software distributed under the GPL.
+   Git has a mutable index called stage.
+   Git tracks change of files.
+   <<<<<<< HEAD
+   Creating a new branch is quick & simple.
+   =======
+   Creating a new branch is quick AND simple.
+   >>>>>>> branch1
+   ```
+
+   Git用 `<<<<<<<`，`=======`，`>>>>>>>`标记出不同分支的内容
+
+   
+
+7. 手动修改readme.txt的内容，并在master分支上添加提交
+
+   ```cmd
+   $ git add readme.txt
+   $ git commit -m "conflict fixed"
+   [master f1444b5] conflict fixed
+   ```
+
+   修改之后的分支图如下：
+
+   ![](https://www.liaoxuefeng.com/files/attachments/919023031831104/0)
+
+8. 使用带参数的`git log`查看合并情况，最后删除分支
+
+   ```cmd
+   $ git log --graph --pretty=oneline --abbrev-commit
+   *   f1444b5 (HEAD -> master) conflict fixed
+   |\
+   | * 9e582c6 (branch1) AND simple
+   * | 2cf795e & simple
+   |/
+   * 19cdd8b branch-test
+   
+   // 删除分支
+   $ git branch -d branch1
+   Deleted branch branch1 (was 9e582c6).
+   
+   // 查看readme.txt内容
+   $ cat readme.txt
+   Git is a distributed version control system.
+   Git is free software distributed under the GPL.
+   Git has a mutable index called stage.
+   Git tracks change of files.
+   Creating a new branch is quick and simple.
+   ```
+
+​        **小结**：当 Git 无法自动合并分支时，就要解决分支冲突，然后提交，合并完成；解决冲突就是把 Git 合并失败的文件手动编辑为我们希望的内容，再提交；用 `git log --graph`命令可以看到分支合并图
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
