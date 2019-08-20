@@ -793,19 +793,219 @@ Receiving objects: 100% (3/3), done.
 
 
 
+### 4.分支管理策略
+
+​		我们通常在合并分支时，GIt可能会使用 Fast forward模式，在这种模式下，删除分支会丢掉分支信息。如果说强制禁用`--no-ff`这种模式，Git就会在merge时生成一个新的commit，这样，从分支历史上就可以看到分支信息
+
+1. 创建并切换分支
+
+   ```cmd
+   $ git checkout -b dev
+   Switched to a new branch 'dev'
+   ```
+
+2. 修改readme.txt文件，并添加提交
+
+   ```cmd
+   $ git add readme.txt
+   $ git commit -m "add merge"
+   [dev 72446e9] add merge
+    1 file changed, 1 insertion(+)
+   ```
+
+3. 切换至主分支master，并合并分支，使用 no-ff参数
+
+   ```cmd
+   $ git checkout master
+   Switched to branch 'master'
+   
+   $ git merge --no-ff -m "merge with no-ff" dev
+   Merge made by the 'recursive' strategy.
+    readme.txt | 1 +
+    1 file changed, 1 insertion(+)
+   ```
+
+   ​		因为使用了 `no-ff` 参数，故合并时生成了一个新的commit，所以加上 -m 参数，并添加提交描述
+
+4. 查看分支历史
+
+   ```cmd
+   $ git log --graph --pretty=oneline --abbrev-commit
+   *   72546fc (HEAD -> master) merge with no-ff
+   |\
+   | * 72446e9 (dev) add merge
+   |/
+   *   f1444b5 conflict fixed
+   |\
+   | * 9e582c6 AND simple
+   * | 2cf795e & simple
+   |/
+   * 19cdd8b branch-test
+   ```
+
+   ​		可以看到不使用`Fast forward`模式下的分支merge图：
+
+   ![](https://www.liaoxuefeng.com/files/attachments/919023225142304/0)
+
+5. 分支管理策略
+
+   1. `master`主分支应该是非常稳定的，也就是仅用来发布新版本，不会在上面进行内容频繁提交（工作）
+
+   2. 工作时都是在`dev`上，dev 分支不稳定，完成工作需要提交某个版本时直接合并到`master`分支上，在`master`分支上发布这个版本
+
+   3. 开发成员都在`dev`分支上工作，每个人都有自己的分支，随时向`dev`分支合并就行了
+
+      ![](https://www.liaoxuefeng.com/files/attachments/919023260793600/0)
+
+        **小结**：GIt 分支十分强大，在团队开发中应该充分应用；合并分支时，加上`--no-ff`参数就可以使用普通模式合并，合并后的历史有分支，能显示出以前做过合并，而`Fast forward`模式下合并就无法看出	
+
+   
+
+### 5.Bug分支
+
+### 6.Feature分支
+
+### 7.多人协作
+
+### 8.Rebase
 
 
 
+## 五、标签管理
+
+### 1.概念
+
+​		我们在发布一个版本时，通常要现在版本库中打一个标签（tag），这样就唯一确定了打标签时刻的版本，以后在取某个标签的版本时，就是把那个打标签时刻的历史版本取出来，所以，标签也是版本库的一个快照
+
+​		Git 的标签虽然是版本库的快照，但其实它就是指向某个commit的指针，（和分支类似，但是分支可以移动，tag不能移动），所以创建和删除标签都是快速完成的
+
+​		引入标签的意义：前面说了，标签是指向某个commit的指针（二者绑定），由于每个commit的 id 很长且繁琐，使用标签来代替commit的 id 就可以快速找到需要的某个版本
+
+### 2.创建标签
+
+1. 切换到需要打上标签的分支上
+
+2. 使用`git tag name`打上一个新的标签，并查看所有标签
+
+   ```cmd
+   $ git tag v1.0
+   // 查看所有标签
+   $ git tag
+   v1.0
+   ```
+
+   ​	**注**：标签默认是打在最新提交的commit 上的，但有时候需要在以前的提交上打标签，就要通过commit的 id 来操作
+
+3. 对历史提交的commit打上标签
+
+   ```cmd
+   $ git log --pretty=oneline --abbrev-commit
+   72546fc (HEAD -> master, tag: v1.0) merge with no-ff
+   72446e9 (dev) add merge
+   f1444b5 conflict fixed
+   2cf795e & simple
+   9e582c6 AND simple
+   19cdd8b branch-test
+   
+   // 给 & simple commit打上标签
+   $ git tag v0.9 2cf795e
+   
+   // 查看所有标签
+   $ git tag
+   v0.9
+   v1.0
+   ```
+
+   ​	**注**：标签列出顺序不是按照时间列出的，而是按照字母数字排列出的
+
+4. 可以创建带说明的标签，`-a`指定标签名，`-m`添加说明文字，使用`git show name`查看说明信息
+
+   ```cmd
+   $ git tag -a v0.2 -m "version 0.2 released" 19cdd8b
+   // 查看标签信息
+   $ git show v0.2
+   tag v0.2
+   Tagger: heiye-vn <1064239893@qq.com>
+   Date:   Tue Aug 20 12:00:08 2019 +0800
+   
+   version 0.2 released
+   
+   commit 19cdd8b762f9ffc329e66693d97a811eaeb02d34 (tag: v0.2)
+   Author: heiye-vn <1064239893@qq.com>
+   Date:   Mon Aug 19 11:55:59 2019 +0800
+   
+       branch-test
+   
+   diff --git a/readme.txt b/readme.txt
+   ```
+
+   ​	**注**：因为标签和commit是相关联的，如果这个commit在多个分支上都有，那么同一个标签也会在多个分支上
+
+   **小结**：1.使用`git tag name`创建一个新的标签，默认为HEAD，也可以指定某一个commit（通过id查找）
+
+   ​			2.使用`git tag -a name -m "xxxxx" commit_id `可以指定标签信息
+
+   ​			3.使用`git tag`查看所有标签 
+
+   ​			4.使用`git show name`查看标签信息
+
+### 3.操作标签
+
+1. 可以删除错误的标签
+
+   ```
+   $ git tag -d v0.1
+   Deleted tag 'v0.1' (was cc4ffb0)
+   ```
+
+2. 推送标签到远程仓库
+
+   ​		因为创建的标签只存储在本地，不会自动推送到远程，所以错误的标签可以在本地安全删除，并且还可以推送到远程仓库
+
+   ```cmd
+   // 推送某一个标签
+   $ git push origin v1.0
+   Total 0 (delta 0), reused 0 (delta 0)
+   To github.com:michaelliao/learngit.git
+    * [new tag]         v1.0 -> v1.0
+    // 一次性推送所有标签
+   $ git push origin --tags
+   Total 0 (delta 0), reused 0 (delta 0)
+   To github.com:michaelliao/learngit.git
+    * [new tag]         v0.9 -> v0.9
+   ```
+
+3. 删除远程仓库中的标签
+
+   ```cmd
+   // 首先从本地删除
+   $ git tag -d v0.9
+   Deleted tag 'v0.9' (was f52c633)
+   
+   // 再从远程删除
+   $ git push origin :refs/tags/v0.9
+   To github.com:michaelliao/learngit.git
+    - [deleted]         v0.9
+    // 可以在GitHub中验证是否删除
+   ```
+
+**小结**：1.使用`git push origin name`可以推送一个本地标签到远程仓库
+
+​			2.使用`git push origin --tags`可以推送所有未推送的本地标签到远程仓库
+
+​			3.使用`git tag -d name`可以删除一个本地标签
+
+​			4.使用`git push origin :refs/tags/name`可以删除远程仓库的标签（前提是先在本地仓库删除标签）
 
 
 
+## 六、自定义Git
 
+### 1.忽略特殊文件
 
+### 2.配置别名
 
-
-
-
-
+### 3.搭建Git服务
 
 
 
