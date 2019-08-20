@@ -288,7 +288,7 @@ aa37579 HEAD@{6}: commit (initial): worte a readme file
 
    **注**：即在电脑中能看到的目录，如：learnGit就是一个工作区
 
-   ![](F:\Git-Study\GitCourse-Liao Xuefeng version\images/1.png)
+   ![工作区](https://github.com/heiye-vn/New-Git-Notes/blob/master/images/1.png)
 
 2. 版本库（Repository）
 
@@ -318,11 +318,11 @@ aa37579 HEAD@{6}: commit (initial): worte a readme file
 
    此时暂存区的状态图示：
 
-   ![暂存区](F:\Git-Study\GitCourse-Liao Xuefeng version\images/2.png)
+   ![暂存区](https://github.com/heiye-vn/New-Git-Notes/blob/master/images/2.png)
 
 提交之后且未对工作区的文件再做修改，此时暂存区的状态：
 
-![](F:\Git-Study\GitCourse-Liao Xuefeng version\images/3.png)
+![暂存区](https://github.com/heiye-vn/New-Git-Notes/blob/master/images/3.png)
 
 **总结**：暂存区是Git中很重要的概念，了解的暂存区的工作原理，就知道了 git 中很多操作的具体作用
 
@@ -676,7 +676,7 @@ Receiving objects: 100% (3/3), done.
 
 2. 在readme.txt文件中新增一行内容
 
-   ![](F:\Git-Study\GitCourse-Liao Xuefeng version\images/4.png)
+   ![](https://github.com/heiye-vn/New-Git-Notes/blob/master/images/4.png)
 
 3. 在branch1分支上添加并提交修改
 
@@ -694,7 +694,7 @@ Receiving objects: 100% (3/3), done.
    Switched to branch 'master'
    ```
 
-   ![](F:\Git-Study\GitCourse-Liao Xuefeng version\images/5.png)
+   ![](https://github.com/heiye-vn/New-Git-Notes/blob/master/images/5.png)
 
 5. 在master分支上添加并提交修改
 
