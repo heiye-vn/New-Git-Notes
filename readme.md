@@ -2,11 +2,13 @@
 
 ------
 
-##### 这个仓库记录的是在学习Git时总结的知识点
+## 这个仓库记录的是在学习Git时总结的知识点
 
 
 
-可进入到  [Git-Notes.md](https://github.com/heiye-vn/Git-Notes/edit/master/Notes.md)  进行查看，谢谢！！！
+可进入到  [Git-Notes.md](https://github.com/heiye-vn/New-Git-Notes/blob/master/Notes.md)  进行查看，谢谢！！！
+
+### 提示：由于文章内容比较多（加载时间可能有点慢），GitHub上无法根据内容导航查看，可以将 md文件或者 pdf文件 clone/download 到本地阅读
 
 
 
